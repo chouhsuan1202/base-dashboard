@@ -1,0 +1,1531 @@
+{
+  "config": {
+    "start_date": "2026-07-10",
+    "baseline_kg": 74.0,
+    "goal_kg": 68.0,
+    "budget_kcal": 1800,
+    "budget_pending_bmr": false,
+    "gym_per_week": 2,
+    "eating_window_hours": 8,
+    "phase": "loss",
+    "weekly_loss_kg": 0.3,
+    "horizon_weeks": 4
+  },
+  "entries": [
+    {
+      "date": "2026-07-10",
+      "weight_kg": 73.7,
+      "meals": [
+        {
+          "time": "09:47",
+          "desc": "Oatmeal with banana and milk",
+          "kcal": 320,
+          "source": "photo",
+          "nutri": [
+            "grain",
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "12:43",
+          "desc": "Chicken salad, quinoa and peppers",
+          "kcal": 450,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg",
+            "grain"
+          ]
+        },
+        {
+          "time": "18:02",
+          "desc": "Roast chicken, sweet potato and beans",
+          "kcal": 540,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        },
+        {
+          "time": "14:14",
+          "desc": "Bubble tea, half sugar",
+          "kcal": 340,
+          "source": "photo",
+          "junk": true
+        }
+      ],
+      "gym": true,
+      "note": ""
+    },
+    {
+      "date": "2026-07-11",
+      "weight_kg": 73.8,
+      "meals": [
+        {
+          "time": "11:14",
+          "desc": "Yogurt bowl with honey and nuts",
+          "kcal": 300,
+          "source": "photo",
+          "nutri": [
+            "dairy"
+          ]
+        },
+        {
+          "time": "14:37",
+          "desc": "Shrimp fried brown rice, broccoli",
+          "kcal": 490,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg",
+            "grain"
+          ]
+        },
+        {
+          "time": "18:48",
+          "desc": "Tofu miso hotpot, mushrooms",
+          "kcal": 380,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-07-12",
+      "weight_kg": 73.8,
+      "meals": [
+        {
+          "time": "10:05",
+          "desc": "Greek yogurt, blueberries and walnuts",
+          "kcal": 280,
+          "source": "photo",
+          "nutri": [
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "13:06",
+          "desc": "Shrimp fried brown rice, broccoli",
+          "kcal": 490,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg",
+            "grain"
+          ]
+        },
+        {
+          "time": "18:38",
+          "desc": "Tofu miso hotpot, mushrooms",
+          "kcal": 380,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        },
+        {
+          "time": "15:46",
+          "desc": "Bag of potato chips",
+          "kcal": 270,
+          "source": "photo",
+          "junk": true
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-07-13",
+      "weight_kg": 73.6,
+      "meals": [
+        {
+          "time": "09:40",
+          "desc": "Two fried eggs, avocado toast",
+          "kcal": 380,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "12:36",
+          "desc": "Beef soba noodles, soft egg",
+          "kcal": 560,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "16:02",
+          "desc": "Steamed sea bass, sauteed spinach",
+          "kcal": 430,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-07-14",
+      "weight_kg": 73.9,
+      "meals": [
+        {
+          "time": "09:17",
+          "desc": "Yogurt bowl with honey and nuts",
+          "kcal": 300,
+          "source": "photo",
+          "nutri": [
+            "dairy"
+          ]
+        },
+        {
+          "time": "12:40",
+          "desc": "Shrimp fried brown rice, broccoli",
+          "kcal": 490,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg",
+            "grain"
+          ]
+        },
+        {
+          "time": "16:23",
+          "desc": "Tofu miso hotpot, mushrooms",
+          "kcal": 380,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        },
+        {
+          "time": "14:44",
+          "desc": "Three cookies",
+          "kcal": 180,
+          "source": "photo",
+          "junk": true
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-07-15",
+      "weight_kg": 73.7,
+      "meals": [
+        {
+          "time": "11:10",
+          "desc": "Oatmeal with banana and milk",
+          "kcal": 320,
+          "source": "photo",
+          "nutri": [
+            "grain",
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "14:24",
+          "desc": "Shrimp fried brown rice, broccoli",
+          "kcal": 490,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg",
+            "grain"
+          ]
+        },
+        {
+          "time": "18:43",
+          "desc": "Tofu miso hotpot, mushrooms",
+          "kcal": 380,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        },
+        {
+          "time": "16:14",
+          "desc": "Bag of potato chips",
+          "kcal": 270,
+          "source": "photo",
+          "junk": true
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-07-16",
+      "weight_kg": 73.7,
+      "meals": [
+        {
+          "time": "09:36",
+          "desc": "Oatmeal with banana and milk",
+          "kcal": 320,
+          "source": "photo",
+          "nutri": [
+            "grain",
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "12:13",
+          "desc": "Beef soba noodles, soft egg",
+          "kcal": 560,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "18:41",
+          "desc": "Steak with grilled zucchini",
+          "kcal": 580,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-07-17",
+      "weight_kg": 73.4,
+      "meals": [
+        {
+          "time": "10:37",
+          "desc": "Yogurt bowl with honey and nuts",
+          "kcal": 300,
+          "source": "photo",
+          "nutri": [
+            "dairy"
+          ]
+        },
+        {
+          "time": "13:23",
+          "desc": "Shrimp fried brown rice, broccoli",
+          "kcal": 490,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg",
+            "grain"
+          ]
+        },
+        {
+          "time": "17:32",
+          "desc": "Steamed sea bass, sauteed spinach",
+          "kcal": 430,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": true,
+      "note": ""
+    },
+    {
+      "date": "2026-07-18",
+      "weight_kg": 73.2,
+      "meals": [
+        {
+          "time": "11:38",
+          "desc": "Yogurt bowl with honey and nuts",
+          "kcal": 300,
+          "source": "photo",
+          "nutri": [
+            "dairy"
+          ]
+        },
+        {
+          "time": "14:24",
+          "desc": "Chicken salad, quinoa and peppers",
+          "kcal": 450,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg",
+            "grain"
+          ]
+        },
+        {
+          "time": "20:33",
+          "desc": "Steak with grilled zucchini",
+          "kcal": 580,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        },
+        {
+          "time": "16:00",
+          "desc": "Latte",
+          "kcal": 130,
+          "source": "photo",
+          "nutri": [
+            "dairy"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-07-19",
+      "weight_kg": 73.1,
+      "meals": [
+        {
+          "time": "10:07",
+          "desc": "Two fried eggs, avocado toast",
+          "kcal": 380,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "13:27",
+          "desc": "Beef soba noodles, soft egg",
+          "kcal": 560,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "19:00",
+          "desc": "Steamed sea bass, sauteed spinach",
+          "kcal": 430,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-07-20",
+      "weight_kg": 73.1,
+      "meals": [
+        {
+          "time": "09:40",
+          "desc": "Greek yogurt, blueberries and walnuts",
+          "kcal": 280,
+          "source": "photo",
+          "nutri": [
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "12:40",
+          "desc": "Beef soba noodles, soft egg",
+          "kcal": 560,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "16:23",
+          "desc": "Steamed sea bass, sauteed spinach",
+          "kcal": 430,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-07-21",
+      "weight_kg": 73.3,
+      "meals": [
+        {
+          "time": "09:31",
+          "desc": "Two fried eggs, avocado toast",
+          "kcal": 380,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "12:07",
+          "desc": "Chicken salad, quinoa and peppers",
+          "kcal": 450,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg",
+            "grain"
+          ]
+        },
+        {
+          "time": "17:15",
+          "desc": "Tofu miso hotpot, mushrooms",
+          "kcal": 380,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        },
+        {
+          "time": "14:05",
+          "desc": "Latte",
+          "kcal": 130,
+          "source": "photo",
+          "nutri": [
+            "dairy"
+          ]
+        }
+      ],
+      "gym": true,
+      "note": ""
+    },
+    {
+      "date": "2026-07-22",
+      "weight_kg": 72.9,
+      "meals": [
+        {
+          "time": "09:42",
+          "desc": "Oatmeal with banana and milk",
+          "kcal": 320,
+          "source": "photo",
+          "nutri": [
+            "grain",
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "12:35",
+          "desc": "Shrimp fried brown rice, broccoli",
+          "kcal": 490,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg",
+            "grain"
+          ]
+        },
+        {
+          "time": "17:33",
+          "desc": "Steamed sea bass, sauteed spinach",
+          "kcal": 430,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-07-23",
+      "weight_kg": 72.9,
+      "meals": [
+        {
+          "time": "11:45",
+          "desc": "Oatmeal with banana and milk",
+          "kcal": 320,
+          "source": "photo",
+          "nutri": [
+            "grain",
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "14:25",
+          "desc": "Beef soba noodles, soft egg",
+          "kcal": 560,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "20:33",
+          "desc": "Tofu miso hotpot, mushrooms",
+          "kcal": 380,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-07-24",
+      "weight_kg": 72.8,
+      "meals": [],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-07-25",
+      "weight_kg": 73.0,
+      "meals": [],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-07-26",
+      "weight_kg": 72.6,
+      "meals": [],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-07-27",
+      "weight_kg": 72.7,
+      "meals": [
+        {
+          "time": "10:13",
+          "desc": "Yogurt bowl with honey and nuts",
+          "kcal": 300,
+          "source": "photo",
+          "nutri": [
+            "dairy"
+          ]
+        },
+        {
+          "time": "13:46",
+          "desc": "Salmon rice bowl, miso soup",
+          "kcal": 520,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "17:50",
+          "desc": "Steak with grilled zucchini",
+          "kcal": 580,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-07-28",
+      "weight_kg": 72.6,
+      "meals": [
+        {
+          "time": "10:26",
+          "desc": "Yogurt bowl with honey and nuts",
+          "kcal": 300,
+          "source": "photo",
+          "nutri": [
+            "dairy"
+          ]
+        },
+        {
+          "time": "13:46",
+          "desc": "Shrimp fried brown rice, broccoli",
+          "kcal": 490,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg",
+            "grain"
+          ]
+        },
+        {
+          "time": "17:03",
+          "desc": "Roast chicken, sweet potato and beans",
+          "kcal": 540,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": true,
+      "note": ""
+    },
+    {
+      "date": "2026-07-29",
+      "weight_kg": 72.6,
+      "meals": [
+        {
+          "time": "10:27",
+          "desc": "Oatmeal with banana and milk",
+          "kcal": 320,
+          "source": "photo",
+          "nutri": [
+            "grain",
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "13:17",
+          "desc": "Salmon rice bowl, miso soup",
+          "kcal": 520,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "17:04",
+          "desc": "Steak with grilled zucchini",
+          "kcal": 580,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-07-30",
+      "weight_kg": 72.6,
+      "meals": [],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-07-31",
+      "weight_kg": 72.6,
+      "meals": [
+        {
+          "time": "09:26",
+          "desc": "Oatmeal with banana and milk",
+          "kcal": 320,
+          "source": "photo",
+          "nutri": [
+            "grain",
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "12:30",
+          "desc": "Shrimp fried brown rice, broccoli",
+          "kcal": 490,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg",
+            "grain"
+          ]
+        },
+        {
+          "time": "18:03",
+          "desc": "Steamed sea bass, sauteed spinach",
+          "kcal": 430,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        },
+        {
+          "time": "14:24",
+          "desc": "Bag of potato chips",
+          "kcal": 270,
+          "source": "photo",
+          "junk": true
+        }
+      ],
+      "gym": true,
+      "note": ""
+    },
+    {
+      "date": "2026-08-01",
+      "weight_kg": 72.3,
+      "meals": [
+        {
+          "time": "11:09",
+          "desc": "Yogurt bowl with honey and nuts",
+          "kcal": 300,
+          "source": "photo",
+          "nutri": [
+            "dairy"
+          ]
+        },
+        {
+          "time": "14:18",
+          "desc": "Salmon rice bowl, miso soup",
+          "kcal": 520,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "18:37",
+          "desc": "Steamed sea bass, sauteed spinach",
+          "kcal": 430,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-08-02",
+      "weight_kg": 72.3,
+      "meals": [],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-08-03",
+      "weight_kg": 72.5,
+      "meals": [
+        {
+          "time": "09:11",
+          "desc": "Greek yogurt, blueberries and walnuts",
+          "kcal": 280,
+          "source": "photo",
+          "nutri": [
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "12:38",
+          "desc": "Chicken salad, quinoa and peppers",
+          "kcal": 450,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg",
+            "grain"
+          ]
+        },
+        {
+          "time": "16:25",
+          "desc": "Roast chicken, sweet potato and beans",
+          "kcal": 540,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        },
+        {
+          "time": "14:15",
+          "desc": "Latte",
+          "kcal": 130,
+          "source": "photo",
+          "nutri": [
+            "dairy"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-08-04",
+      "weight_kg": 72.0,
+      "meals": [],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-08-05",
+      "weight_kg": 72.2,
+      "meals": [
+        {
+          "time": "10:42",
+          "desc": "Oatmeal with banana and milk",
+          "kcal": 320,
+          "source": "photo",
+          "nutri": [
+            "grain",
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "13:15",
+          "desc": "Beef soba noodles, soft egg",
+          "kcal": 560,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "19:08",
+          "desc": "Tofu miso hotpot, mushrooms",
+          "kcal": 380,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-08-06",
+      "weight_kg": 72.0,
+      "meals": [
+        {
+          "time": "09:29",
+          "desc": "Greek yogurt, blueberries and walnuts",
+          "kcal": 280,
+          "source": "photo",
+          "nutri": [
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "12:04",
+          "desc": "Chicken salad, quinoa and peppers",
+          "kcal": 450,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg",
+            "grain"
+          ]
+        },
+        {
+          "time": "17:08",
+          "desc": "Steamed sea bass, sauteed spinach",
+          "kcal": 430,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-08-07",
+      "weight_kg": 72.2,
+      "meals": [
+        {
+          "time": "09:34",
+          "desc": "Yogurt bowl with honey and nuts",
+          "kcal": 300,
+          "source": "photo",
+          "nutri": [
+            "dairy"
+          ]
+        },
+        {
+          "time": "12:39",
+          "desc": "Beef soba noodles, soft egg",
+          "kcal": 560,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "17:42",
+          "desc": "Roast chicken, sweet potato and beans",
+          "kcal": 540,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        },
+        {
+          "time": "14:16",
+          "desc": "Bubble tea, half sugar",
+          "kcal": 340,
+          "source": "photo",
+          "junk": true
+        }
+      ],
+      "gym": true,
+      "note": ""
+    },
+    {
+      "date": "2026-08-08",
+      "weight_kg": 72.0,
+      "meals": [
+        {
+          "time": "11:45",
+          "desc": "Oatmeal with banana and milk",
+          "kcal": 320,
+          "source": "photo",
+          "nutri": [
+            "grain",
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "14:13",
+          "desc": "Beef soba noodles, soft egg",
+          "kcal": 560,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "20:16",
+          "desc": "Tofu miso hotpot, mushrooms",
+          "kcal": 380,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-08-09",
+      "weight_kg": 71.7,
+      "meals": [
+        {
+          "time": "10:00",
+          "desc": "Greek yogurt, blueberries and walnuts",
+          "kcal": 280,
+          "source": "photo",
+          "nutri": [
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "13:49",
+          "desc": "Beef soba noodles, soft egg",
+          "kcal": 560,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "18:10",
+          "desc": "Steamed sea bass, sauteed spinach",
+          "kcal": 430,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-08-10",
+      "weight_kg": 71.8,
+      "meals": [],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-08-11",
+      "weight_kg": 72.0,
+      "meals": [
+        {
+          "time": "11:23",
+          "desc": "Greek yogurt, blueberries and walnuts",
+          "kcal": 280,
+          "source": "photo",
+          "nutri": [
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "14:27",
+          "desc": "Salmon rice bowl, miso soup",
+          "kcal": 520,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "18:19",
+          "desc": "Steamed sea bass, sauteed spinach",
+          "kcal": 430,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        },
+        {
+          "time": "16:22",
+          "desc": "Bag of potato chips",
+          "kcal": 270,
+          "source": "photo",
+          "junk": true
+        }
+      ],
+      "gym": true,
+      "note": ""
+    },
+    {
+      "date": "2026-08-12",
+      "weight_kg": 71.6,
+      "meals": [
+        {
+          "time": "10:15",
+          "desc": "Oatmeal with banana and milk",
+          "kcal": 320,
+          "source": "photo",
+          "nutri": [
+            "grain",
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "13:11",
+          "desc": "Salmon rice bowl, miso soup",
+          "kcal": 520,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "17:11",
+          "desc": "Steak with grilled zucchini",
+          "kcal": 580,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-08-13",
+      "weight_kg": 72.0,
+      "meals": [
+        {
+          "time": "11:17",
+          "desc": "Oatmeal with banana and milk",
+          "kcal": 320,
+          "source": "photo",
+          "nutri": [
+            "grain",
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "14:50",
+          "desc": "Salmon rice bowl, miso soup",
+          "kcal": 520,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "20:02",
+          "desc": "Roast chicken, sweet potato and beans",
+          "kcal": 540,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-08-14",
+      "weight_kg": 71.9,
+      "meals": [
+        {
+          "time": "10:14",
+          "desc": "Oatmeal with banana and milk",
+          "kcal": 320,
+          "source": "photo",
+          "nutri": [
+            "grain",
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "13:42",
+          "desc": "Chicken salad, quinoa and peppers",
+          "kcal": 450,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg",
+            "grain"
+          ]
+        },
+        {
+          "time": "19:21",
+          "desc": "Steamed sea bass, sauteed spinach",
+          "kcal": 430,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        },
+        {
+          "time": "15:49",
+          "desc": "Bag of potato chips",
+          "kcal": 270,
+          "source": "photo",
+          "junk": true
+        }
+      ],
+      "gym": true,
+      "note": ""
+    },
+    {
+      "date": "2026-08-15",
+      "weight_kg": 71.6,
+      "meals": [
+        {
+          "time": "11:01",
+          "desc": "Two fried eggs, avocado toast",
+          "kcal": 380,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "14:16",
+          "desc": "Chicken salad, quinoa and peppers",
+          "kcal": 450,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg",
+            "grain"
+          ]
+        },
+        {
+          "time": "19:02",
+          "desc": "Steamed sea bass, sauteed spinach",
+          "kcal": 430,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        },
+        {
+          "time": "16:22",
+          "desc": "An apple",
+          "kcal": 90,
+          "source": "photo",
+          "nutri": [
+            "fruit"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-08-16",
+      "weight_kg": 71.5,
+      "meals": [
+        {
+          "time": "11:24",
+          "desc": "Greek yogurt, blueberries and walnuts",
+          "kcal": 280,
+          "source": "photo",
+          "nutri": [
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "14:16",
+          "desc": "Salmon rice bowl, miso soup",
+          "kcal": 520,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "20:00",
+          "desc": "Roast chicken, sweet potato and beans",
+          "kcal": 540,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-08-17",
+      "weight_kg": 71.6,
+      "meals": [
+        {
+          "time": "11:23",
+          "desc": "Oatmeal with banana and milk",
+          "kcal": 320,
+          "source": "photo",
+          "nutri": [
+            "grain",
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "14:04",
+          "desc": "Shrimp fried brown rice, broccoli",
+          "kcal": 490,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg",
+            "grain"
+          ]
+        },
+        {
+          "time": "19:42",
+          "desc": "Tofu miso hotpot, mushrooms",
+          "kcal": 380,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-08-18",
+      "weight_kg": 71.3,
+      "meals": [
+        {
+          "time": "10:25",
+          "desc": "Two fried eggs, avocado toast",
+          "kcal": 380,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "13:35",
+          "desc": "Beef soba noodles, soft egg",
+          "kcal": 560,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "17:26",
+          "desc": "Steamed sea bass, sauteed spinach",
+          "kcal": 430,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": true,
+      "note": ""
+    },
+    {
+      "date": "2026-08-19",
+      "weight_kg": 71.1,
+      "meals": [
+        {
+          "time": "10:19",
+          "desc": "Greek yogurt, blueberries and walnuts",
+          "kcal": 280,
+          "source": "photo",
+          "nutri": [
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "13:13",
+          "desc": "Beef soba noodles, soft egg",
+          "kcal": 560,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "grain"
+          ]
+        },
+        {
+          "time": "18:29",
+          "desc": "Steak with grilled zucchini",
+          "kcal": 580,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        }
+      ],
+      "gym": false,
+      "note": ""
+    },
+    {
+      "date": "2026-08-20",
+      "weight_kg": 71.2,
+      "meals": [
+        {
+          "time": "11:42",
+          "desc": "Oatmeal with banana and milk",
+          "kcal": 320,
+          "source": "photo",
+          "nutri": [
+            "grain",
+            "dairy",
+            "fruit"
+          ]
+        },
+        {
+          "time": "14:18",
+          "desc": "Chicken salad, quinoa and peppers",
+          "kcal": 450,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg",
+            "grain"
+          ]
+        },
+        {
+          "time": "18:48",
+          "desc": "Tofu miso hotpot, mushrooms",
+          "kcal": 380,
+          "source": "photo",
+          "nutri": [
+            "protein",
+            "veg"
+          ]
+        },
+        {
+          "time": "16:14",
+          "desc": "Three cookies",
+          "kcal": 180,
+          "source": "photo",
+          "junk": true
+        }
+      ],
+      "gym": false,
+      "note": "",
+      "body": {
+        "bmi": 24.1,
+        "fat_pct": 27.4,
+        "skeletal_muscle_pct": 41.2,
+        "fat_free_kg": 52.0,
+        "subcutaneous_pct": 24.8,
+        "visceral": 8,
+        "water_pct": 52.4,
+        "muscle_kg": 49.4,
+        "bone_kg": 2.9,
+        "protein_pct": 17.2,
+        "bmr": 1540,
+        "metabolic_age": 31
+      }
+    }
+  ]
+}

@@ -1,0 +1,1492 @@
+<title>減重面板</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#faf9f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#131211" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Base">
+<script>
+/* manifest 與圖示的連結只在最外層文件掛上去，也就是 Cloudflare 上的 Base。
+   發佈成 Artifact 時頁面是在沙箱 iframe 裡跑，同源相對路徑抓不到這些檔案，
+   靜態寫死會讓主控台噴 404，所以改成執行時判斷再插入。路徑一律相對，不打外部網域。 */
+(function () {
+  try {
+    if (window.top !== window.self) return;
+    var head = document.head || document.documentElement;
+    var links = [
+      { rel: "manifest", href: "manifest.json" },
+      { rel: "apple-touch-icon", href: "apple-touch-icon.png" },
+      { rel: "icon", href: "icon-192.png", type: "image/png", sizes: "192x192" }
+    ];
+    links.forEach(function (spec) {
+      var el = document.createElement("link");
+      el.rel = spec.rel;
+      el.href = spec.href;
+      if (spec.type) el.type = spec.type;
+      if (spec.sizes) el.setAttribute("sizes", spec.sizes);
+      head.appendChild(el);
+    });
+  } catch (err) { /* 抓不到 document.head 之類的，忽略 */ }
+})();
+</script>
+<style>
+  /* 淺色是基準，完整定義在 bare :root，兩個 dark 區塊只做覆寫 */
+  :root {
+    color-scheme: light dark;
+    --bg: #faf9f7;
+    --fg: #1a1918;
+    --muted: #6f6a63;
+    --faint: #a29d95;
+    --line: #e6e1da;
+    --hair: #efebe4;
+    --cell: #f1eee8;
+    --good: #3d6d59;
+    --good-fill: rgba(61, 109, 89, 0.14);
+    --warn: #9a5f3c;
+    --warn-fill: rgba(154, 95, 60, 0.14);
+    --none: #cfcac2;
+    --bar-bg: rgba(250, 249, 247, 0.92);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #131211;
+      --fg: #ece9e4;
+      --muted: #918b83;
+      --faint: #6b665f;
+      --line: #2b2925;
+      --hair: #221f1d;
+      --cell: #1e1c1a;
+      --good: #82b498;
+      --good-fill: rgba(130, 180, 152, 0.16);
+      --warn: #c68f63;
+      --warn-fill: rgba(198, 143, 99, 0.16);
+      --none: #3a3733;
+      --bar-bg: rgba(19, 18, 17, 0.92);
+    }
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --bg: #faf9f7;
+    --fg: #1a1918;
+    --muted: #6f6a63;
+    --faint: #a29d95;
+    --line: #e6e1da;
+    --hair: #efebe4;
+    --cell: #f1eee8;
+    --good: #3d6d59;
+    --good-fill: rgba(61, 109, 89, 0.14);
+    --warn: #9a5f3c;
+    --warn-fill: rgba(154, 95, 60, 0.14);
+    --none: #cfcac2;
+    --bar-bg: rgba(250, 249, 247, 0.92);
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #131211;
+    --fg: #ece9e4;
+    --muted: #918b83;
+    --faint: #6b665f;
+    --line: #2b2925;
+    --hair: #221f1d;
+    --cell: #1e1c1a;
+    --good: #82b498;
+    --good-fill: rgba(130, 180, 152, 0.16);
+    --warn: #c68f63;
+    --warn-fill: rgba(198, 143, 99, 0.16);
+    --none: #3a3733;
+    --bar-bg: rgba(19, 18, 17, 0.92);
+  }
+  :root { background: var(--bg); }
+  html, body { min-height: 100%; background: var(--bg); overflow-x: hidden; }
+
+  .wp, .wp * { box-sizing: border-box; }
+  .wp i { font-style: normal; }
+  .wp {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC",
+      "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    margin: 0;
+    padding: 18px 18px 0;
+  }
+  .wp .inner { max-width: 460px; margin: 0 auto; padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px)); }
+  .wp .num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+
+  /* 頁首 */
+  .wp .top { display: flex; align-items: baseline; justify-content: space-between; }
+  .wp .kicker { font-size: 11px; letter-spacing: 0.16em; color: var(--faint); text-transform: uppercase; }
+  .wp .top-btn {
+    font: inherit; font-size: 11.5px; color: var(--faint);
+    background: none; border: 0; padding: 4px 0 4px 12px; cursor: pointer;
+  }
+  .wp .top-btn:hover { color: var(--fg); }
+
+  /* 分頁切換。hidden 一律贏過 display:flex 之類的規則 */
+  .wp [hidden] { display: none !important; }
+  .wp .sheet-back {
+    position: fixed; inset: 0; z-index: 20; background: rgba(20, 18, 16, 0.35);
+    opacity: 0; transition: opacity 0.25s ease;
+  }
+  .wp .sheet-back.open { opacity: 1; }
+  .wp .sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 21;
+    background: var(--bg); border-radius: 16px 16px 0 0;
+    box-shadow: 0 -8px 32px rgba(20, 18, 16, 0.16);
+    padding: 8px 18px calc(28px + env(safe-area-inset-bottom, 0px));
+    max-height: 82vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.32, 0.72, 0.28, 1);
+  }
+  .wp .sheet.open { transform: translateY(0); }
+  .wp .sheet-inner { max-width: 460px; margin: 0 auto; }
+  .wp .sheet-grab { width: 36px; height: 4px; border-radius: 2px; background: var(--none); margin: 4px auto 16px; }
+
+  /* 狀態行：一句小字，不當標題 */
+  .wp .verdict {
+    margin-top: 14px; display: flex; align-items: baseline; gap: 8px;
+    font-size: 13px; color: var(--muted); line-height: 1.6;
+  }
+  .wp .verdict .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--none); flex: 0 0 auto; }
+  .wp .verdict.is-good .dot { background: var(--good); }
+  .wp .verdict.is-warn .dot { background: var(--warn); }
+
+  /* 區塊節奏：只用留白與細線分隔，不包框 */
+  .wp section { margin-top: 30px; }
+  .wp section.ruled { padding-top: 24px; border-top: 1px solid var(--line); }
+  .wp h2 {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.14em;
+    color: var(--muted); margin: 0 0 14px; text-transform: uppercase;
+  }
+  .wp .head-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .wp .seg { display: flex; gap: 2px; }
+  .wp .seg button {
+    font: inherit; font-size: 12px; letter-spacing: 0.06em; color: var(--faint);
+    background: none; border: 0; padding: 5px 13px; border-radius: 14px; cursor: pointer;
+  }
+  .wp .seg button.on { color: var(--fg); background: var(--cell); font-weight: 600; }
+  .wp .head-row h2 { margin: 0; }
+  .wp .daylabel { font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; }
+  .wp .nav { display: flex; align-items: center; gap: 2px; }
+  .wp .nav button {
+    font: inherit; font-size: 16px; line-height: 1; color: var(--muted);
+    background: none; border: 0; padding: 6px 10px; cursor: pointer; border-radius: 4px;
+  }
+  .wp .nav button:hover { color: var(--fg); }
+  .wp .nav button[disabled] { color: var(--none); cursor: default; }
+  .wp .nav .label { font-size: 12.5px; color: var(--muted); min-width: 86px; text-align: center; font-variant-numeric: tabular-nums; }
+
+  /* 週曆：主視圖 */
+  .wp .weekcal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 16px; }
+  .wp .wc {
+    border: 0; background: none; font: inherit; color: inherit; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 1px;
+    padding: 8px 2px 7px; border-radius: 9px; min-height: 84px;
+  }
+  .wp .wc.has { background: var(--cell); }
+  .wp .wc.sel { background: var(--good-fill); }
+  .wp .wc:focus-visible { outline: 2px solid var(--good); outline-offset: 1px; }
+  .wp .wc .dw { font-size: 10px; color: var(--faint); }
+  .wp .wc.today .dw { color: var(--fg); font-weight: 600; }
+  .wp .wc .dn { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .wp .wc.sel .dn { color: var(--good); font-weight: 600; }
+  .wp .wc .w { font-size: 13px; margin-top: 3px; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; }
+  .wp .wc .kc { font-size: 10.5px; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .wp .wc .kc.ok { color: var(--good); }
+  .wp .wc .kc.over { color: var(--warn); }
+  .wp .wc .marks { margin-top: auto; display: flex; align-items: center; gap: 3px; height: 8px; }
+  .wp .pip { width: 4.5px; height: 4.5px; border-radius: 50%; }
+  .wp .pip.ok { background: var(--good); }
+  .wp .pip.over { background: var(--warn); }
+  .wp .pip.win { background: var(--good); opacity: 0.45; }
+  .wp .pip.gym { border-radius: 1px; background: var(--muted); }
+  .wp .weekgoal-line { margin-top: 12px; font-size: 11.5px; color: var(--faint); }
+  .wp .weekgoal-line b { font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
+  /* 達標徽章：只有拿到才顯眼，其他狀態維持低調，不要讓沒達標變成責備 */
+  .wp .wbadge:empty { display: none; }
+  .wp .wbadge {
+    margin-left: 8px; padding: 2px 8px; border-radius: 999px;
+    font-size: 10.5px; letter-spacing: 0.01em; font-variant-numeric: tabular-nums;
+    color: var(--muted); background: var(--cell);
+  }
+  .wp .wbadge.hit { color: #fff; background: var(--good); font-weight: 600; }
+  .wp .wbadge.near { color: var(--good); background: var(--good-fill); }
+  .wp .wbadge.miss { color: var(--warn); background: var(--warn-fill); }
+  .wp .lastweek { margin-top: 6px; font-size: 11.5px; color: var(--faint); }
+  .wp .lastweek b { font-weight: 500; font-variant-numeric: tabular-nums; }
+  .wp .lastweek .good { color: var(--good); font-weight: 600; }
+
+  /* 當日細節 */
+  .wp .gauges { display: flex; flex-direction: column; gap: 14px; }
+  .wp .gauge .g-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .wp .gauge .g-k { font-size: 12px; color: var(--muted); }
+  .wp .gauge .g-v { font-size: 15px; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  .wp .gauge .g-v small { font-size: 11.5px; color: var(--faint); margin-left: 5px; letter-spacing: 0; }
+  .wp .gauge .g-v.over { color: var(--warn); }
+  .wp .gauge .g-v.ok { color: var(--good); }
+  .wp .bar { margin-top: 6px; height: 5px; border-radius: 3px; background: var(--cell); overflow: hidden; }
+  .wp .bar .fill { height: 100%; border-radius: 3px; background: var(--good); opacity: 0.55; }
+  .wp .bar .fill.over { background: var(--warn); opacity: 1; }
+
+  .wp .kh {
+    display: block; width: 100%; text-align: left; background: none; border: 0;
+    font: inherit; color: inherit; padding: 0; cursor: pointer;
+  }
+  .wp .kh:focus-visible { outline: 2px solid var(--good); outline-offset: 4px; border-radius: 4px; }
+  .wp .kh-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .wp .kh-num { font-size: 38px; font-weight: 300; letter-spacing: -0.025em; line-height: 1.05; }
+  .wp .kh-num small { font-size: 13px; color: var(--faint); margin-left: 7px; letter-spacing: 0; font-weight: 400; }
+  .wp .kh-num.over { color: var(--warn); }
+  .wp .kh-more { font-size: 11.5px; color: var(--faint); white-space: nowrap; }
+  .wp .kh .bar { margin-top: 10px; height: 6px; }
+  .wp .kh-sub { margin-top: 7px; font-size: 12px; color: var(--muted); }
+  .wp .meals { margin-top: 14px; }
+  .wp .meal-row {
+    display: grid; grid-template-columns: 44px 1fr auto; align-items: baseline; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid var(--hair); font-size: 13.5px;
+  }
+  .wp .meal-row:first-child { border-top: 1px solid var(--hair); }
+  .wp .meal-row .t { font-size: 11.5px; color: var(--faint); font-variant-numeric: tabular-nums; }
+  .wp .meal-row .t.same { color: transparent; }
+  .wp .meal-row .kc { font-variant-numeric: tabular-nums; color: var(--muted); }
+  .wp .meal-row .nut { display: block; font-size: 10.5px; color: var(--faint); margin-top: 1px; letter-spacing: 0.02em; }
+  .wp .meal-row .nut.bad { color: var(--warn); }
+  .wp .meal-row .tag { font-size: 10.5px; color: var(--faint); margin-left: 6px; }
+  .wp .day-lines { margin-top: 14px; font-size: 12px; color: var(--muted); line-height: 1.75; }
+  .wp .day-lines .lab { color: var(--faint); }
+  .wp .day-lines .bad { color: var(--warn); }
+  .wp .day-lines .ok { color: var(--good); }
+  .wp .day-note { margin-top: 10px; font-size: 12.5px; color: var(--muted); line-height: 1.65; }
+  .wp .empty { font-size: 12.5px; color: var(--faint); padding: 4px 0; }
+
+  /* 本週統計 */
+  .wp .week { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px 22px; }
+  .wp .week .v { font-size: 21px; font-weight: 400; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .wp .week .k { font-size: 11px; color: var(--faint); margin-top: 1px; }
+  .wp .week .v small { font-size: 12px; color: var(--faint); margin-left: 4px; letter-spacing: 0; }
+  .wp .wrange { margin-top: 16px; font-size: 11.5px; color: var(--faint); line-height: 1.7; }
+
+  /* 趨勢分頁 */
+  .wp .hero { margin-top: 22px; display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+  .wp .hero-num { display: flex; align-items: baseline; gap: 8px; }
+  .wp .hero-num .big {
+    font-size: 68px; line-height: 0.92; font-weight: 250; letter-spacing: -0.035em;
+    font-variant-numeric: tabular-nums;
+  }
+  .wp .hero-num .unit { font-size: 15px; color: var(--faint); }
+  .wp .hero-side { display: flex; gap: 16px; padding-bottom: 5px; }
+  .wp .mini .mv { display: block; font-size: 19px; font-weight: 400; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .wp .mini .mk { display: block; font-size: 10.5px; color: var(--faint); letter-spacing: 0.02em; }
+  .wp .hero-sub { margin-top: 9px; font-size: 12px; color: var(--faint); }
+
+  .wp .track { margin-top: 22px; }
+  .wp .trk-labels { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--faint); margin-bottom: 7px; }
+  .wp .trk-rail { position: relative; height: 6px; border-radius: 3px; background: var(--cell); }
+  .wp .trk-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: var(--good); opacity: 0.85; }
+  .wp .trk-fill.behind { background: var(--warn); }
+  .wp .trk-tick { position: absolute; top: -6px; width: 1.5px; height: 18px; background: var(--fg); }
+  .wp .gap { margin-top: 9px; font-size: 12.5px; color: var(--muted); }
+  .wp .gap b { font-weight: 500; font-variant-numeric: tabular-nums; }
+  .wp .gap b.behind { color: var(--warn); }
+  .wp .gap b.ahead { color: var(--good); }
+
+  .wp .chart { width: 100%; height: auto; display: block; overflow: visible; }
+  .wp .chart-note { margin-top: 12px; font-size: 11px; color: var(--faint); display: flex; flex-wrap: wrap; gap: 14px; }
+  .wp .chart-note i { display: inline-flex; align-items: center; gap: 6px; }
+  .wp .swatch-line { width: 15px; height: 2px; background: var(--good); display: block; }
+  .wp .swatch-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--good); opacity: 0.45; display: block; }
+  .wp .swatch-band { width: 15px; height: 9px; background: var(--good-fill); border-top: 1px dashed var(--good); border-bottom: 1px dashed var(--good); display: block; }
+
+  /* 體組成 */
+  .wp .bodygrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px 20px; }
+  .wp .bodygrid .k { font-size: 11px; color: var(--faint); }
+  .wp .bodygrid .v { font-size: 17px; font-weight: 400; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .wp .bodygrid .v small { font-size: 11px; color: var(--faint); margin-left: 2px; letter-spacing: 0; }
+  .wp .bodygrid .delta { font-size: 11px; margin-left: 6px; font-variant-numeric: tabular-nums; }
+  .wp .delta.good { color: var(--good); }
+  .wp .delta.bad { color: var(--warn); }
+  .wp .delta.flat { color: var(--faint); }
+  .wp .body-note { margin-top: 16px; font-size: 11px; color: var(--faint); line-height: 1.7; }
+
+  /* 里程碑。刻意收斂：達成的用主色加日期，沒達成的淡色加還差多少，沒有徽章沒有裝飾 */
+  .wp .ms { display: flex; flex-direction: column; }
+  .wp .ms-row {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 14px;
+    padding: 9px 0; font-size: 13.5px; border-bottom: 1px solid var(--line);
+  }
+  .wp .ms-row:last-child { border-bottom: 0; }
+  .wp .ms-row .l { color: var(--faint); font-variant-numeric: tabular-nums; }
+  .wp .ms-row .r { white-space: nowrap; font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; }
+  .wp .ms-row.done .l { color: var(--fg); }
+  .wp .ms-row.done .r { color: var(--good); }
+  .wp .ms-row.next .l { color: var(--muted); }
+  .wp .ms-row .tag { font-size: 10.5px; color: var(--faint); margin-left: 7px; letter-spacing: 0.02em; }
+  .wp .ms-row.done .tag { color: var(--good); }
+
+  /* 剛達成的那一行，放在頂部判斷句下面 */
+  .wp .fresh {
+    margin-top: 9px; font-size: 12.5px; color: var(--good);
+    display: flex; align-items: baseline; gap: 7px;
+  }
+  .wp .fresh b { font-weight: 500; font-variant-numeric: tabular-nums; }
+  .wp .fresh .when { color: var(--faint); font-size: 11px; }
+
+  /* 月曆分頁 */
+  .wp .dow, .wp .grid { display: grid; grid-template-columns: 30px repeat(7, 1fr); gap: 3px; }
+  .wp .dow { margin-bottom: 6px; }
+  .wp .dow span { font-size: 10px; color: var(--faint); text-align: center; }
+  .wp .dow .goal-h { font-size: 9px; letter-spacing: -0.03em; }
+  .wp .goal {
+    grid-column: 1; font-size: 10.5px; color: var(--faint); font-variant-numeric: tabular-nums;
+    display: flex; align-items: center; justify-content: center; letter-spacing: -0.03em;
+  }
+  .wp .cell {
+    min-height: 56px; border-radius: 6px; padding: 4px 2px 3px;
+    display: flex; flex-direction: column; align-items: center; border: 1px solid transparent;
+  }
+  .wp .cell.has { background: var(--cell); }
+  .wp .cell.today { box-shadow: inset 0 0 0 1px var(--fg); }
+  .wp .cell.out { visibility: hidden; }
+  .wp .cell.day { cursor: pointer; }
+  .wp .cell.sel { background: var(--good-fill); }
+  .wp .cell.sel .d { color: var(--good); font-weight: 600; }
+  .wp .cell.day:focus-visible { outline: 2px solid var(--good); outline-offset: 1px; }
+  .wp .cell .d { font-size: 9.5px; color: var(--faint); font-variant-numeric: tabular-nums; }
+  .wp .cell.has .d { color: var(--muted); }
+  .wp .cell .w { font-size: 12px; margin-top: 1px; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; }
+  .wp .cell .marks { margin-top: auto; display: flex; align-items: center; gap: 3px; height: 9px; }
+  .wp .legend { display: flex; flex-wrap: wrap; gap: 10px 14px; margin-top: 14px; font-size: 10.5px; color: var(--faint); }
+  .wp .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .wp .legend .pip { width: 6px; height: 6px; }
+  .wp .legend .pip.gym { border-radius: 1px; }
+
+  .wp footer {
+    margin-top: 34px; padding-top: 18px; border-top: 1px solid var(--line);
+    font-size: 11px; color: var(--faint); line-height: 1.8;
+  }
+  .wp footer .row { display: flex; gap: 6px 14px; flex-wrap: wrap; }
+
+  @media (min-width: 700px) {
+    .wp { padding: 32px 24px 0; }
+    .wp .inner { max-width: 640px; }
+    .wp .hero-num .big { font-size: 72px; }
+    .wp .wc { min-height: 96px; }
+    .wp .cell { min-height: 62px; }
+    .wp .week { grid-template-columns: repeat(4, 1fr); }
+    .wp .bodygrid { grid-template-columns: repeat(4, 1fr); }
+  }
+</style>
+
+<div class="wp">
+  <div class="inner">
+    <div class="top">
+      <div class="kicker" id="wp-kicker">Base</div>
+      <button class="top-btn" id="wp-reload" type="button" aria-label="重新抓最新資料">重新整理</button>
+    </div>
+
+    <div id="wp-view-week">
+      <div class="hero">
+        <div class="hero-num">
+          <span class="big num" id="wp-latest">--</span>
+          <span class="unit">kg</span>
+        </div>
+        <div class="hero-side">
+          <div class="mini"><span class="mv num" id="wp-weekgoal">--</span><span class="mk">本週目標</span></div>
+          <div class="mini"><span class="mv num" id="wp-trialgoal">--</span><span class="mk" id="wp-trialgoal-k">四週目標</span></div>
+        </div>
+      </div>
+      <div class="verdict" id="wp-verdict"><i class="dot"></i><span id="wp-verdict-text">載入中</span></div>
+      <div class="fresh" id="wp-fresh" hidden></div>
+
+      <section>
+        <div class="head-row">
+          <h2>進度</h2>
+          <span class="daylabel num" id="wp-track-range"></span>
+        </div>
+        <div id="wp-track"></div>
+        <div class="gap" id="wp-gap"></div>
+      </section>
+
+      <section>
+        <div class="head-row">
+          <div class="seg" role="group" aria-label="週或月">
+            <button type="button" id="wp-cal-week" class="on">週</button>
+            <button type="button" id="wp-cal-month">月</button>
+          </div>
+          <div class="nav" id="wp-weeknav">
+            <button type="button" id="wp-wprev" aria-label="上一週">&lsaquo;</button>
+            <span class="label num" id="wp-week-label"></span>
+            <button type="button" id="wp-wnext" aria-label="下一週">&rsaquo;</button>
+          </div>
+          <div class="nav" id="wp-monthnav" hidden>
+            <button type="button" id="wp-prev" aria-label="上一月">&lsaquo;</button>
+            <span class="label num" id="wp-month"></span>
+            <button type="button" id="wp-next" aria-label="下一月">&rsaquo;</button>
+          </div>
+        </div>
+        <div id="wp-weekwrap">
+          <div class="weekcal" id="wp-weekcal"></div>
+          <div class="weekgoal-line" id="wp-weekgoal-line"><span id="wp-goaltext">這週目標 <b class="num" id="wp-seggoal">--</b> kg</span><span class="wbadge" id="wp-weekbadge"></span></div>
+          <div class="lastweek" id="wp-lastweek"></div>
+        </div>
+        <div id="wp-monthwrap" hidden>
+          <div class="dow">
+            <span class="goal-h">週目標</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span>
+          </div>
+          <div class="grid" id="wp-grid"></div>
+          <div class="legend">
+            <span><i class="pip ok"></i>熱量達標</span>
+            <span><i class="pip over"></i>熱量超標</span>
+            <span><i class="pip win"></i>進食區間達標</span>
+            <span><i class="pip gym"></i>健身房</span>
+            <span>空白格就是沒記錄</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="ruled">
+        <div class="head-row">
+          <h2 id="wp-day-title">今天</h2>
+          <span class="daylabel num" id="wp-detail-date"></span>
+        </div>
+        <div id="wp-detail"></div>
+      </section>
+
+      <section class="ruled">
+        <div class="head-row">
+          <h2>這週統計</h2>
+          <span class="daylabel num" id="wp-week-stat-label"></span>
+        </div>
+        <div class="week">
+          <div>
+            <div class="v num" id="wp-kcal">--</div>
+            <div class="k" id="wp-kcal-k">平均熱量</div>
+          </div>
+          <div>
+            <div class="v num" id="wp-168">--</div>
+            <div class="k">進食區間達標</div>
+          </div>
+          <div>
+            <div class="v num" id="wp-gym">--</div>
+            <div class="k">健身房</div>
+          </div>
+          <div>
+            <div class="v num" id="wp-photo">--</div>
+            <div class="k">拍照記錄天數</div>
+          </div>
+        </div>
+        <div class="wrange" id="wp-week-range"></div>
+      </section>
+    </div>
+
+    <div id="wp-view-trend">
+      <section class="ruled">
+        <div class="head-row">
+          <h2>里程碑</h2>
+          <span class="daylabel num" id="wp-ms-count"></span>
+        </div>
+        <div class="ms" id="wp-ms"></div>
+      </section>
+
+      <section>
+        <h2>趨勢</h2>
+        <div id="wp-chart"></div>
+        <div class="chart-note">
+          <i><b class="swatch-dot"></b>單日</i>
+          <i><b class="swatch-line"></b>7 天平均</i>
+          <i><b class="swatch-band"></b>目標走廊</i>
+        </div>
+      </section>
+
+      <section class="ruled">
+        <div class="head-row">
+          <h2>體組成</h2>
+          <span class="daylabel num" id="wp-body-date"></span>
+        </div>
+        <div id="wp-body"></div>
+      </section>
+
+      <footer>
+        <div class="row" id="wp-foot"></div>
+        <div id="wp-foot-note"></div>
+      </footer>
+    </div>
+
+  </div>
+
+  <div class="sheet-back" id="wp-sheet-back" hidden></div>
+  <div class="sheet" id="wp-sheet" hidden role="dialog" aria-modal="true" aria-label="當日細節">
+    <div class="sheet-inner">
+      <div class="sheet-grab"></div>
+      <div class="head-row">
+        <h2 id="wp-sheet-title">當日記錄</h2>
+        <span class="daylabel num" id="wp-sheet-date"></span>
+      </div>
+      <div id="wp-sheet-body"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var DATA = /*__DATA__*/;
+  var cfg = DATA.config || {};
+  var entries = (DATA.entries || []).slice().sort(function (a, b) {
+    return a.date < b.date ? -1 : a.date > b.date ? 1 : 0;
+  });
+
+  var byDate = {};
+  entries.forEach(function (e) { byDate[e.date] = e; });
+
+  var BUDGET = Number(cfg.budget_kcal) || 0;
+  var WINDOW_H = Number(cfg.eating_window_hours) || 0;
+  var GYM_TARGET = Number(cfg.gym_per_week) || 0;
+  var BASE = Number(cfg.baseline_kg);
+  var WEEKLY = Number(cfg.weekly_loss_kg) || 0.3;     // 每週要減多少
+  var HORIZON = Number(cfg.horizon_weeks) || 4;       // 目標永遠看未來幾週
+  var LONG_GOAL = Number(cfg.goal_kg);                // 長期方向，目標不會低於這個
+
+  // 日期一律用 UTC 算，避免時區飄移
+  function iso(d) {
+    var m = d.getUTCMonth() + 1, day = d.getUTCDate();
+    return d.getUTCFullYear() + "-" + (m < 10 ? "0" : "") + m + "-" + (day < 10 ? "0" : "") + day;
+  }
+  function parse(s) {
+    var p = String(s).split("-");
+    return new Date(Date.UTC(+p[0], +p[1] - 1, +p[2]));
+  }
+  function addDays(d, n) { return new Date(d.getTime() + n * 86400000); }
+  function diffDays(a, b) { return Math.round((b.getTime() - a.getTime()) / 86400000); }
+  function mondayIndex(d) { return (d.getUTCDay() + 6) % 7; }
+  function md(d) { return (d.getUTCMonth() + 1) + "/" + d.getUTCDate(); }
+
+  var now = new Date();
+  var today = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+  var todayISO = iso(today);
+  var start = parse(cfg.start_date);
+
+  function kcalOf(e) {
+    if (!e || !e.meals || !e.meals.length) return null;
+    return e.meals.reduce(function (s, m) { return s + (Number(m.kcal) || 0); }, 0);
+  }
+  function weightOf(e) {
+    if (!e || e.weight_kg === null || e.weight_kg === undefined) return null;
+    return Number(e.weight_kg);
+  }
+  function toMin(t) {
+    var m = /^(\d{1,2}):(\d{2})$/.exec(String(t || "").trim());
+    if (!m) return null;
+    var h = +m[1], mi = +m[2];
+    if (h > 23 || mi > 59) return null;
+    return h * 60 + mi;
+  }
+  function fmtClock(min) {
+    var h = Math.floor(min / 60), m = min % 60;
+    return (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
+  }
+  function fmtShort(min) {
+    var h = min / 60;
+    if (h >= 10) return Math.round(h) + "h";
+    return (Math.round(h * 10) / 10) + "h";
+  }
+  function windowOf(e) {
+    if (!e || !e.meals || !e.meals.length) return null;
+    var ts = [];
+    e.meals.forEach(function (m) {
+      var v = toMin(m.time);
+      if (v !== null) ts.push(v);
+    });
+    if (!ts.length) return null;
+    ts.sort(function (a, b) { return a - b; });
+    var span = ts[ts.length - 1] - ts[0];
+    return {
+      first: ts[0], last: ts[ts.length - 1], count: ts.length, mins: span,
+      ok: WINDOW_H <= 0 || span <= WINDOW_H * 60
+    };
+  }
+  function hasPhoto(e) {
+    if (!e || !e.meals) return false;
+    return e.meals.some(function (m) { return m.source === "photo"; });
+  }
+  function ma7(dateStr) {
+    var d = parse(dateStr), sum = 0, n = 0;
+    for (var i = 0; i < 7; i++) {
+      var w = weightOf(byDate[iso(addDays(d, -i))]);
+      if (w !== null) { sum += w; n++; }
+    }
+    return n ? sum / n : null;
+  }
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+  function f1(n) { return n.toFixed(1); }
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+
+  var weighed = entries.filter(function (e) { return weightOf(e) !== null; });
+  var last = weighed.length ? weighed[weighed.length - 1] : null;
+  var lastMa = last ? ma7(last.date) : null;
+
+  /* 週目標：一個日曆週為一段，週一到週日，從起跑週的週一起算，
+     每週一往前推，成績用當週最後一次量到的體重判定。 */
+  var segFirstMon = addDays(start, -mondayIndex(start));
+  var thisMon = addDays(today, -mondayIndex(today));
+
+  /* 滾動目標：不設死線，每週一以現況為起點往前推 HORIZON 週。
+     這樣目標永遠在前面等著，不會像固定死線那樣提早達成後失去意義。
+
+     起點取「上週日收盤體重」與「最新體重」的較低者，理由：
+     目標必須低於使用者站上體重計看到的數字，否則兩個字沒有意義。 */
+  var weekAnchor = (function () {
+    var prevClose = null;
+    for (var i = 1; i <= 14; i++) {
+      var w = weightOf(byDate[iso(addDays(thisMon, -i))]);
+      if (w !== null) { prevClose = w; break; }
+    }
+    var latestW = last ? weightOf(last) : null;
+    var vals = [prevClose, latestW].filter(function (v) { return v !== null; });
+    if (!vals.length) return isNaN(BASE) ? null : BASE;
+    return Math.min.apply(null, vals);
+  })();
+
+  function goalAfterWeeks(n) {
+    if (weekAnchor === null) return null;
+    var v = weekAnchor - WEEKLY * n;
+    if (!isNaN(LONG_GOAL)) v = Math.max(v, LONG_GOAL);
+    return Math.round(v * 10) / 10;
+  }
+  var horizonTarget = goalAfterWeeks(HORIZON);
+  var horizonEnd = addDays(thisMon, HORIZON * 7 - 1);
+
+  var segGoals = {};
+  (function () {
+    if (weekAnchor === null) return;
+    // 已經過去的週：用當時的收盤往前推一週，成績是歷史，不事後改寫
+    for (var k = 0; k < 60; k++) {
+      var m = addDays(segFirstMon, k * 7);
+      if (m >= thisMon) break;
+      var prev = null;
+      for (var i = 1; i <= 14; i++) {
+        var w = weightOf(byDate[iso(addDays(m, -i))]);
+        if (w !== null) { prev = w; break; }
+      }
+      var basis = prev === null ? BASE : prev;
+      if (isNaN(basis)) continue;
+      var g = basis - WEEKLY;
+      if (!isNaN(LONG_GOAL)) g = Math.max(g, LONG_GOAL);
+      segGoals[iso(m)] = Math.round(g * 10) / 10;
+    }
+    // 這週與未來 HORIZON 週
+    for (var j = 0; j < HORIZON; j++) {
+      segGoals[iso(addDays(thisMon, j * 7))] = goalAfterWeeks(j + 1);
+    }
+  })();
+  function segStartOf(monday) {
+    var dw = diffDays(segFirstMon, monday);
+    return addDays(segFirstMon, Math.floor(dw / 7) * 7);
+  }
+  function goalOfSeg(monday) {
+    var g = segGoals[iso(segStartOf(monday))];
+    return g === undefined ? null : g;
+  }
+  var thisGoal = goalOfSeg(addDays(today, -mondayIndex(today)));
+
+  /* 一週的成績：拿那週最後一次量到的體重去比那週的目標。
+     用實際數字而不是 7 天平均，因為那才是使用者每天站上體重計看到的數字，
+     用平均會出現「站上去明明到了，面板說還沒」的矛盾。
+     還沒過完的那週給 state "running"，結果還沒定，只講差距不講成敗。 */
+  var NEAR = 0.2;   // 差這麼多以內算「快到了」，值得在視覺上鼓勵一下
+  function weekResult(monday) {
+    var goal = goalOfSeg(monday);
+    if (goal === null) return null;
+    var lastDay = null;
+    for (var i = 0; i < 7; i++) {
+      var k = iso(addDays(monday, i));
+      if (weightOf(byDate[k]) !== null) lastDay = k;
+    }
+    if (lastDay === null) return { goal: goal, state: "none" };
+    var ma = weightOf(byDate[lastDay]);
+    if (ma === null) return { goal: goal, state: "none" };
+    var gap = ma - goal;
+    var over = addDays(monday, 6) < today;   // 這週是不是已經結束
+    var state;
+    if (gap <= 0.05) state = "hit";
+    else if (gap <= NEAR) state = over ? "miss" : "near";
+    else state = over ? "miss" : "running";
+    return { goal: goal, ma: ma, gap: gap, state: state, done: over };
+  }
+  var lastWeekResult = weekResult(addDays(today, -mondayIndex(today) - 7));
+
+  // 頂部判斷句：今天是好是壞，加一句這週在不在軌道上
+  var trackState = "none";
+  (function () {
+    /* 落後或超前要跟「今天該在的位置」比，不是跟週日的目標比。
+       週一早上還沒到週末目標是理所當然的，那不叫落後，那叫才剛開始。
+       所以在起點與目標之間拉一條直線，看今天實際站在線的哪一邊。 */
+    var nowW1 = last ? weightOf(last) : null;
+    if (nowW1 !== null && thisGoal !== null && weekAnchor !== null) {
+      var elapsed = clamp(diffDays(thisMon, today) / 6, 0, 1);   // 週一 0，週日 1
+      var due = weekAnchor - (weekAnchor - thisGoal) * elapsed;
+      var d = nowW1 - due;
+      var abs = Math.abs(d);
+      if (abs < 0.05) trackState = "good";
+      else trackState = d > 0 ? (abs <= 0.3 ? "near" : "behind") : "ahead";
+    }
+    var e = byDate[todayISO];
+    var kc = kcalOf(e);
+    var win = windowOf(e);
+    var state = "none", main = "今天還沒有記錄";
+    if (kc === null) {
+      main = weightOf(e) !== null ? "今天量了體重，飲食還沒記" : "今天還沒有記錄";
+    } else if (kc > BUDGET) {
+      state = "warn";
+      main = "今天超出預算 " + (kc - BUDGET) + " kcal";
+    } else {
+      state = "good";
+      main = "今天還在預算內";
+    }
+    if (win && kc !== null && !win.ok) {
+      state = "warn";
+      main += "，進食區間超過 " + WINDOW_H + " 小時";
+    }
+    var wk = { good: "這週在軌道上", ahead: "這週超前", near: "這週差一點", behind: "這週落後", none: "" }[trackState];
+    if (wk) main += "。" + wk;
+    document.getElementById("wp-verdict").className = "verdict is-" + (state === "warn" ? "warn" : state === "good" ? "good" : "none");
+    document.getElementById("wp-verdict-text").textContent = main;
+  })();
+
+  document.getElementById("wp-weekgoal").textContent = thisGoal === null ? "--" : f1(thisGoal);
+  (function () {
+    if (horizonTarget === null) return;
+    document.getElementById("wp-trialgoal").textContent = f1(horizonTarget);
+    document.getElementById("wp-trialgoal-k").textContent = md(horizonEnd) + " 目標";
+  })();
+
+  // 週曆：主視圖。selected 是當日細節顯示的日子，預設今天
+  var selected = todayISO;
+  var DOW = ["一", "二", "三", "四", "五", "六", "日"];
+  var minMon = addDays(start, -mondayIndex(start));
+  var maxAnchor = today < horizonEnd ? horizonEnd : today;
+  var maxMon = addDays(maxAnchor, -mondayIndex(maxAnchor));
+  var weekView = addDays(today, -mondayIndex(today));
+  if (weekView < minMon) weekView = minMon;
+
+  function renderWeek() {
+    var label = document.getElementById("wp-week-label");
+    var wEnd = addDays(weekView, 6);
+    label.textContent = md(weekView) + " 到 " + md(wEnd);
+    document.getElementById("wp-wprev").disabled = weekView <= minMon;
+    document.getElementById("wp-wnext").disabled = weekView >= maxMon;
+
+    var html = "";
+    for (var i = 0; i < 7; i++) {
+      var d = addDays(weekView, i);
+      var key = iso(d);
+      var e = byDate[key];
+      var w = weightOf(e);
+      var kc = kcalOf(e);
+      var win = windowOf(e);
+      var known = !!e && (w !== null || kc !== null || e.gym);
+      var cls = "wc" + (known ? " has" : "") + (key === todayISO ? " today" : "") + (key === selected ? " sel" : "");
+      html += '<button type="button" class="' + cls + '" data-date="' + key + '" aria-label="' + key + '">';
+      html += '<span class="dw">' + DOW[i] + "</span>";
+      html += '<span class="dn num">' + d.getUTCDate() + "</span>";
+      html += '<span class="w num">' + (w === null ? "" : f1(w)) + "</span>";
+      html += '<span class="kc num ' + (kc === null ? "" : kc > BUDGET ? "over" : "ok") + '">' + (kc === null ? "" : kc) + "</span>";
+      html += '<span class="marks">';
+      if (win && win.ok) html += '<i class="pip win"></i>';
+      if (e && e.gym) html += '<i class="pip gym"></i>';
+      html += "</span></button>";
+    }
+    document.getElementById("wp-weekcal").innerHTML = html;
+
+    var g = goalOfSeg(weekView);
+    document.getElementById("wp-seggoal").textContent = g === null ? "--" : f1(g);
+
+    /* 目標旁邊直接講這週的狀態。達標了就給一枚徽章，這是整個計畫裡少數能拿到的
+       正回饋，值得看得見；快到了就講還差多少，讓最後那一點差距有動力補上。 */
+    var badge = document.getElementById("wp-weekbadge");
+    var r = weekResult(weekView);
+    var viewingThisWeek = iso(weekView) === iso(thisMon);
+    // 本週的目標數字已經在頂部，這行整個讓位給徽章；差多少由上面的進度句講
+    document.getElementById("wp-goaltext").hidden = viewingThisWeek;
+    badge.className = "wbadge";
+    badge.textContent = "";
+    if (r && r.state === "hit") {
+      badge.className = "wbadge hit";
+      badge.textContent = r.done ? "達標" : "已達標";
+    } else if (r && !viewingThisWeek) {
+      if (r.state === "miss") {
+        badge.className = "wbadge miss";
+        badge.textContent = "差 " + f1(r.gap) + " 沒到";
+      } else if (r.state === "near" || r.state === "running") {
+        badge.textContent = "還差 " + f1(r.gap);
+      }
+    }
+
+    /* 上一週的結果只在看「本週」時顯示，翻到別週時上一週是誰會混淆。
+       達標寫成一句肯定句，這是回饋不是統計。 */
+    var lw = document.getElementById("wp-lastweek");
+    var isThisWeek = iso(weekView) === iso(addDays(today, -mondayIndex(today)));
+    if (isThisWeek && lastWeekResult && lastWeekResult.state !== "none") {
+      if (lastWeekResult.state === "hit") {
+        lw.innerHTML = '<span class="good">上週達標了</span>，目標 <b>' + f1(lastWeekResult.goal) +
+          "</b>，收在 <b>" + f1(lastWeekResult.ma) + "</b> kg";
+      } else {
+        lw.innerHTML = "上週目標 <b>" + f1(lastWeekResult.goal) + "</b>，收在 <b>" +
+          f1(lastWeekResult.ma) + "</b> kg，差 <b>" + f1(lastWeekResult.gap) + "</b>";
+      }
+    } else {
+      lw.innerHTML = "";
+    }
+
+    // 這一週的統計，跟著週曆翻頁
+    var photoDays = 0, gymDays = 0, kcalSum = 0, kcalDays = 0, winOkDays = 0;
+    var balancedDays = 0, weekJunk = 0, weekKcal = 0, nutDays = 0;
+    for (var j = 0; j < 7; j++) {
+      var ee = byDate[iso(addDays(weekView, j))];
+      if (!ee) continue;
+      if (hasPhoto(ee)) photoDays++;
+      if (ee.gym) gymDays++;
+      var k = kcalOf(ee);
+      if (k !== null) { kcalSum += k; kcalDays++; }
+      var wn = windowOf(ee);
+      if (wn && wn.ok) winOkDays++;
+      var nn = nutriOf(ee);
+      if (nn) {
+        nutDays++;
+        weekJunk += nn.junk;
+        weekKcal += nn.total;
+        if (nn.got.length >= 3) balancedDays++;
+      }
+    }
+    document.getElementById("wp-week-stat-label").textContent = md(weekView) + " 到 " + md(wEnd);
+    document.getElementById("wp-photo").textContent = photoDays + " 天";
+    document.getElementById("wp-168").textContent = winOkDays + " 天";
+    document.getElementById("wp-gym").textContent = gymDays + " / " + (GYM_TARGET || 2);
+    var elK = document.getElementById("wp-kcal");
+    var elKk = document.getElementById("wp-kcal-k");
+    if (kcalDays) {
+      var avg = Math.round(kcalSum / kcalDays);
+      elK.innerHTML = avg + "<small>/ " + BUDGET + "</small>";
+      elKk.textContent = "平均熱量，" + (avg > BUDGET ? "超出 " + (avg - BUDGET) : "低於目標 " + (BUDGET - avg));
+    } else {
+      elK.innerHTML = "--<small>/ " + BUDGET + "</small>";
+      elKk.textContent = "平均熱量，還沒有記錄";
+    }
+    var rangeTxt = "每日預算 " + BUDGET + " kcal" + (WINDOW_H > 0 ? "，進食區間 " + WINDOW_H + " 小時內" : "");
+    if (nutDays) {
+      rangeTxt += "。營養均衡 " + balancedDays + " / " + nutDays + " 天";
+      if (weekKcal > 0 && weekJunk > 0) {
+        rangeTxt += "，沒營養的佔 " + Math.round((weekJunk / weekKcal) * 100) + "%";
+      }
+    }
+    document.getElementById("wp-week-range").textContent = rangeTxt;
+  }
+
+  // 週或月，同一個位置換視圖
+  var calMode = "week";
+  function setCalMode(m) {
+    calMode = m;
+    document.getElementById("wp-cal-week").className = m === "week" ? "on" : "";
+    document.getElementById("wp-cal-month").className = m === "month" ? "on" : "";
+    document.getElementById("wp-weekwrap").hidden = m !== "week";
+    document.getElementById("wp-weeknav").hidden = m !== "week";
+    document.getElementById("wp-monthwrap").hidden = m !== "month";
+    document.getElementById("wp-monthnav").hidden = m !== "month";
+  }
+  document.getElementById("wp-cal-week").addEventListener("click", function () { setCalMode("week"); });
+  document.getElementById("wp-cal-month").addEventListener("click", function () { setCalMode("month"); });
+
+  document.getElementById("wp-wprev").addEventListener("click", function () {
+    weekView = addDays(weekView, -7);
+    renderWeek();
+  });
+  document.getElementById("wp-wnext").addEventListener("click", function () {
+    weekView = addDays(weekView, 7);
+    renderWeek();
+  });
+  document.getElementById("wp-weekcal").addEventListener("click", function (ev) {
+    var t = ev.target;
+    var host = document.getElementById("wp-weekcal");
+    while (t && t !== host && !t.getAttribute("data-date")) t = t.parentNode;
+    if (t && t !== host) pick(t.getAttribute("data-date"));
+  });
+
+  // 營養：每餐可標 nutri（哪幾類）與 junk（沒營養）。沒標就是中性，不算好也不算壞
+  var NUT = { protein: "蛋白", veg: "蔬菜", fruit: "水果", grain: "全穀", dairy: "乳品" };
+  var NUT_ORDER = ["protein", "veg", "fruit", "grain", "dairy"];
+  function nutriOf(e) {
+    if (!e || !e.meals || !e.meals.length) return null;
+    var have = {}, junk = 0, tot = 0;
+    e.meals.forEach(function (m) {
+      var k = Number(m.kcal) || 0;
+      tot += k;
+      if (m.junk) junk += k;
+      (m.nutri || []).forEach(function (n) { if (NUT[n]) have[n] = true; });
+    });
+    var got = NUT_ORDER.filter(function (n) { return have[n]; });
+    return { got: got, miss: NUT_ORDER.filter(function (n) { return !have[n]; }), junk: junk, total: tot };
+  }
+
+  function fmtDur(min) {
+    var h = Math.floor(min / 60), m = min % 60;
+    return m ? h + " 小時 " + m + " 分" : h + " 小時";
+  }
+
+  // 面板上只留熱量，點了才開 sheet 看細節
+  function renderDetail() {
+    var d = parse(selected);
+    var isToday = selected === todayISO;
+    document.getElementById("wp-day-title").textContent = isToday ? "今天" : "當日熱量";
+    document.getElementById("wp-detail-date").textContent = md(d) + " 週" + DOW[mondayIndex(d)];
+
+    var e = byDate[selected];
+    var meals = (e && e.meals) || [];
+    var total = kcalOf(e);
+    var box = document.getElementById("wp-detail");
+
+    if (total === null) {
+      var w0 = weightOf(e);
+      var hasAny = !!e && (w0 !== null || e.gym || (e.note || "") !== "");
+      box.innerHTML = '<div class="empty">' + (hasAny ? "沒有飲食記錄" : "這天沒有記錄") + "</div>";
+      return;
+    }
+    var over = total > BUDGET;
+    var h = '<button type="button" class="kh" data-open-sheet>';
+    h += '<div class="kh-row"><span class="kh-num num' + (over ? " over" : "") + '">' + total +
+      "<small>/ " + BUDGET + " kcal</small></span>" +
+      '<span class="kh-more">' + meals.length + " 筆記錄 &rsaquo;</span></div>";
+    h += '<div class="bar"><div class="fill' + (over ? " over" : "") + '" style="width:' +
+      (clamp(total / (BUDGET || 1), 0, 1) * 100).toFixed(1) + '%"></div></div>';
+    h += '<div class="kh-sub">' + (over ? "超出 " + (total - BUDGET) : "還剩 " + (BUDGET - total)) + " kcal</div>";
+    h += "</button>";
+    box.innerHTML = h;
+  }
+
+  // sheet 內容：那一天的完整細節
+  function sheetHtml(dateStr) {
+    var e = byDate[dateStr];
+    var w = weightOf(e);
+    var meals = (e && e.meals) || [];
+    var total = kcalOf(e);
+    var win = windowOf(e);
+    var hasAny = !!e && (w !== null || meals.length > 0 || e.gym || (e.note || "") !== "");
+    if (!hasAny) return '<div class="empty">這天沒有記錄</div>';
+
+    var h = "";
+    if (total !== null) {
+      var over = total > BUDGET;
+      h += '<div class="kh-row"><span class="kh-num num' + (over ? " over" : "") + '">' + total +
+        "<small>/ " + BUDGET + " kcal</small></span>" +
+        '<span class="kh-more">' + (over ? "超出 " + (total - BUDGET) : "還剩 " + (BUDGET - total)) + "</span></div>";
+      h += '<div class="bar" style="margin-top:10px;height:6px"><div class="fill' + (over ? " over" : "") + '" style="width:' +
+        (clamp(total / (BUDGET || 1), 0, 1) * 100).toFixed(1) + '%"></div></div>';
+    }
+    if (meals.length) {
+      h += '<div class="meals">';
+      var prevT = null;
+      meals.forEach(function (m) {
+        var tm = toMin(m.time);
+        var clock = tm === null ? "" : fmtClock(tm);
+        var same = tm !== null && tm === prevT;
+        prevT = tm;
+        var names = (m.nutri || []).map(function (n) { return NUT[n]; }).filter(Boolean).join(" ");
+        var nut = m.junk ? '<span class="nut bad">沒營養</span>'
+          : (names ? '<span class="nut">' + names + "</span>" : "");
+        var tag = m.source === "estimated" ? '<span class="tag">估計</span>' : "";
+        h += '<div class="meal-row"><span class="t num' + (same ? " same" : "") + '">' + clock + "</span>" +
+          "<span>" + esc(m.desc || "餐點") + tag + nut + "</span>" +
+          '<span class="kc">' + (Number(m.kcal) || 0) + "</span></div>";
+      });
+      h += "</div>";
+    }
+
+    var lines = [];
+    if (win) {
+      var winTxt;
+      if (WINDOW_H > 0) {
+        var deadline = (win.first + WINDOW_H * 60) % 1440;
+        if (!win.ok) {
+          winTxt = fmtClock(win.first) + " 到 " + fmtClock(win.last) + "，共 " + fmtDur(win.mins) +
+            '，<span class="bad">超過 ' + WINDOW_H + " 小時上限</span>";
+        } else {
+          winTxt = fmtClock(win.first) + ' 開始吃，<span class="ok">最晚吃到 ' + fmtClock(deadline) + "</span>" +
+            (win.mins > 0 ? "（目前 " + fmtClock(win.first) + " 到 " + fmtClock(win.last) + "）" : "");
+        }
+      } else {
+        winTxt = win.mins === 0 ? fmtClock(win.first)
+          : fmtClock(win.first) + " 到 " + fmtClock(win.last) + "，" + fmtDur(win.mins);
+      }
+      lines.push('<span class="lab">進食區間</span> ' + winTxt);
+    }
+    lines.push('<span class="lab">體重</span> ' + (w === null ? "沒量" : f1(w) + " kg"));
+    var nu = nutriOf(e);
+    if (nu) {
+      lines.push('<span class="lab">吃到</span> ' +
+        (nu.got.length ? nu.got.map(function (n) { return NUT[n]; }).join("、") : "都沒吃到") +
+        (nu.miss.length ? '　<span class="lab">缺</span> ' + nu.miss.map(function (n) { return NUT[n]; }).join("、") : ""));
+      if (nu.junk > 0 && nu.total > 0) {
+        lines.push('<span class="lab">沒營養的</span> <span class="bad">' + nu.junk + " kcal，佔 " +
+          Math.round((nu.junk / nu.total) * 100) + "%</span>");
+      }
+    }
+    lines.push('<span class="lab">健身房</span> ' + (e && e.gym ? '<span class="ok">有去</span>' : "沒去"));
+    h += '<div class="day-lines">' + lines.join("<br>") + "</div>";
+    if (e && e.note) h += '<div class="day-note">' + esc(e.note) + "</div>";
+    return h;
+  }
+
+  var sheetEl = document.getElementById("wp-sheet");
+  var sheetBack = document.getElementById("wp-sheet-back");
+  function openSheet(dateStr) {
+    var d = parse(dateStr);
+    document.getElementById("wp-sheet-title").textContent = dateStr === todayISO ? "今天" : "當日記錄";
+    document.getElementById("wp-sheet-date").textContent = md(d) + " 週" + DOW[mondayIndex(d)];
+    document.getElementById("wp-sheet-body").innerHTML = sheetHtml(dateStr);
+    sheetEl.hidden = false;
+    sheetBack.hidden = false;
+    sheetEl.scrollTop = 0;
+    document.body.style.overflow = "hidden";
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        sheetEl.className = "sheet open";
+        sheetBack.className = "sheet-back open";
+      });
+    });
+  }
+  function closeSheet() {
+    sheetEl.className = "sheet";
+    sheetBack.className = "sheet-back";
+    document.body.style.overflow = "";
+    setTimeout(function () {
+      sheetEl.hidden = true;
+      sheetBack.hidden = true;
+    }, 300);
+  }
+  sheetBack.addEventListener("click", closeSheet);
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key === "Escape" && !sheetEl.hidden) closeSheet();
+  });
+
+  document.getElementById("wp-detail").addEventListener("click", function (ev) {
+    var t = ev.target;
+    var host = document.getElementById("wp-detail");
+    while (t && t !== host && !t.hasAttribute("data-open-sheet")) t = t.parentNode;
+    if (t && t !== host) openSheet(selected);
+  });
+
+  function pick(dateStr) {
+    if (!dateStr) return;
+    selected = dateStr;
+    var d = parse(dateStr);
+    var mon = addDays(d, -mondayIndex(d));
+    if (iso(mon) !== iso(weekView)) {
+      weekView = mon;
+      if (weekView < minMon) weekView = minMon;
+      if (weekView > maxMon) weekView = maxMon;
+    }
+    renderWeek();
+    renderDetail();
+    renderMonth();
+    openSheet(dateStr);
+  }
+
+  // 月視圖：同一個區塊裡切換，點日期選那天
+  var viewY, viewM;
+  (function () {
+    var anchor = today < start ? start : today;
+    viewY = anchor.getUTCFullYear();
+    viewM = anchor.getUTCMonth();
+  })();
+  var minY = start.getUTCFullYear(), minM = start.getUTCMonth();
+  var maxRef = today < horizonEnd ? horizonEnd : today;
+  var maxY = maxRef.getUTCFullYear(), maxM = maxRef.getUTCMonth();
+
+  function renderMonth() {
+    var grid = document.getElementById("wp-grid");
+    document.getElementById("wp-month").textContent = viewY + " / " + (viewM + 1 < 10 ? "0" : "") + (viewM + 1);
+    document.getElementById("wp-prev").disabled = (viewY === minY && viewM === minM);
+    document.getElementById("wp-next").disabled = (viewY === maxY && viewM === maxM);
+
+    var first = new Date(Date.UTC(viewY, viewM, 1));
+    var lead = mondayIndex(first);
+    var days = new Date(Date.UTC(viewY, viewM + 1, 0)).getUTCDate();
+    var rows = Math.ceil((lead + days) / 7);
+    var html = "";
+    for (var r = 0; r < rows; r++) {
+      var rowMon = new Date(Date.UTC(viewY, viewM, 1 - lead + r * 7));
+      // 一週一個目標，每一列都輸出一格
+      var g = goalOfSeg(rowMon);
+      html += '<div class="goal">' + (g === null ? "" : f1(g)) + "</div>";
+      for (var c = 0; c < 7; c++) {
+        var day = r * 7 + c - lead + 1;
+        if (day < 1 || day > days) { html += '<div class="cell out"></div>'; continue; }
+        var d = new Date(Date.UTC(viewY, viewM, day));
+        var key = iso(d);
+        var e = byDate[key];
+        var w = weightOf(e);
+        var kc = kcalOf(e);
+        var win = windowOf(e);
+        var known = !!e && (w !== null || kc !== null || e.gym);
+        var cls = "cell day" + (known ? " has" : "") + (key === todayISO ? " today" : "") +
+          (key === selected ? " sel" : "");
+        html += '<div class="' + cls + '" data-date="' + key + '" role="button" tabindex="0" aria-label="' + key + '">';
+        html += '<div class="d">' + day + "</div>";
+        html += '<div class="w">' + (w === null ? "" : f1(w)) + "</div>";
+        html += '<div class="marks">';
+        if (kc !== null) html += '<i class="pip ' + (kc > BUDGET ? "over" : "ok") + '"></i>';
+        if (win && win.ok) html += '<i class="pip win"></i>';
+        if (e && e.gym) html += '<i class="pip gym"></i>';
+        html += "</div></div>";
+      }
+    }
+    grid.innerHTML = html;
+  }
+
+  document.getElementById("wp-prev").addEventListener("click", function () {
+    viewM--; if (viewM < 0) { viewM = 11; viewY--; }
+    renderMonth();
+  });
+  document.getElementById("wp-next").addEventListener("click", function () {
+    viewM++; if (viewM > 11) { viewM = 0; viewY++; }
+    renderMonth();
+  });
+
+  var gridEl = document.getElementById("wp-grid");
+  gridEl.addEventListener("click", function (ev) {
+    var t = ev.target;
+    while (t && t !== gridEl && !t.getAttribute("data-date")) t = t.parentNode;
+    if (t && t !== gridEl) pick(t.getAttribute("data-date"));
+  });
+  gridEl.addEventListener("keydown", function (ev) {
+    if (ev.key !== "Enter" && ev.key !== " ") return;
+    var t = ev.target;
+    if (t && t.getAttribute && t.getAttribute("data-date")) {
+      ev.preventDefault();
+      pick(t.getAttribute("data-date"));
+    }
+  });
+
+  renderWeek();
+  renderDetail();
+  renderMonth();
+
+  // 趨勢分頁：頂部體重
+  var elLatest = document.getElementById("wp-latest");
+  elLatest.textContent = last ? f1(weightOf(last)) : "--";
+
+  /* 落後或超前多少。比的是 7 天平均而不是單日，單日是雜訊。 */
+  (function () {
+    var el = document.getElementById("wp-gap");
+    // 「還差多少」整個第一屏只在這裡講一次
+    var nowW0 = last ? weightOf(last) : null;
+    if (nowW0 === null || thisGoal === null) { el.textContent = ""; return; }
+    var d = nowW0 - thisGoal;
+    var abs = Math.abs(d);
+    if (abs < 0.05) { el.innerHTML = "正好站在本週目標上"; return; }
+    var behind = d > 0;
+    el.innerHTML = behind
+      ? "還差 " + '<b class="behind">' + abs.toFixed(1) + " kg</b>" + " 到本週目標" + (d <= 0.2 ? "，快到了" : "")
+      : "已經比本週目標低 " + '<b class="ahead">' + abs.toFixed(1) + " kg</b>";
+  })();
+
+  /* 進度軌道：這一輪四週走到哪裡。滾動制沒有死線，看的是本輪窗口的進度 */
+  (function () {
+    var host = document.getElementById("wp-track");
+    var nowW = last ? weightOf(last) : null;
+    if (weekAnchor === null || horizonTarget === null || nowW === null) { host.innerHTML = ""; return; }
+    var totalDrop = weekAnchor - horizonTarget;
+    var doneRatio = totalDrop > 0 ? clamp((weekAnchor - nowW) / totalDrop, 0, 1) : 0;
+    var dayRatio = clamp(diffDays(thisMon, today) / Math.max(1, HORIZON * 7), 0, 1);
+    var behind = doneRatio < dayRatio - 0.001;
+    document.getElementById("wp-track-range").textContent = md(thisMon) + " 到 " + md(horizonEnd);
+    host.innerHTML =
+      '<div class="trk-rail"><div class="trk-fill' + (behind ? " behind" : "") +
+      '" style="width:' + Math.max(1.5, doneRatio * 100).toFixed(1) + '%"></div>' +
+      '<div class="trk-tick" style="left:' + (dayRatio * 100).toFixed(1) + '%"></div></div>';
+    var gapEl = document.getElementById("wp-gap");
+    gapEl.innerHTML = gapEl.innerHTML + (gapEl.innerHTML ? "。" : "") +
+      "這輪走完 " + Math.round(dayRatio * 100) + "%，體重走完 " + Math.round(doneRatio * 100) + "%";
+  })();
+
+  /* 里程碑。判定一律用 7 天平均，單日跳動會讓里程碑一下達成一下取消。
+     節點是從 baseline 下方第一個 0.5 的倍數開始，每 0.5 kg 一個，一路到長期目標。
+     只列出已達成的加接下來兩個，清單才不會長到看不完。 */
+  (function () {
+    var host = document.getElementById("wp-ms");
+    var countEl = document.getElementById("wp-ms-count");
+    var GOAL = Number(cfg.goal_kg);
+    if (isNaN(BASE) || isNaN(GOAL) || !weighed.length) {
+      host.innerHTML = '<div class="body-note">還沒有足夠的體重記錄。</div>';
+      return;
+    }
+
+    var marks = [];
+    var w = Math.floor(BASE * 2) / 2;
+    if (w >= BASE) w -= 0.5;
+    for (; w >= GOAL - 1e-9; w -= 0.5) marks.push(Math.round(w * 10) / 10);
+
+    // 某個節點第一次被 7 天平均跌破是哪一天
+    function reachedOn(kg) {
+      for (var i = 0; i < weighed.length; i++) {
+        var m = ma7(weighed[i].date);
+        if (m !== null && m <= kg + 1e-9) return weighed[i].date;
+      }
+      return null;
+    }
+
+    var rows = marks.map(function (kg) {
+      var tag = "";
+      if (Math.abs(kg - GOAL) < 1e-9) tag = "長期方向";
+      else if (horizonTarget !== null && Math.abs(kg - horizonTarget) < 1e-9) tag = "四週目標";
+      return { kg: kg, tag: tag, on: reachedOn(kg) };
+    });
+
+    var done = rows.filter(function (r) { return r.on; });
+    var pending = rows.filter(function (r) { return !r.on; });
+    countEl.textContent = done.length + " / " + rows.length;
+
+    host.innerHTML = done.concat(pending.slice(0, 2)).map(function (r, i) {
+      var right = r.on
+        ? md(parse(r.on)) + " 達成"
+        : (lastMa === null ? "" : "還差 " + (lastMa - r.kg).toFixed(1) + " kg");
+      return '<div class="ms-row' + (r.on ? " done" : i === done.length ? " next" : "") + '">' +
+        '<span class="l">' + f1(r.kg) + " kg" +
+        (r.tag ? '<i class="tag">' + r.tag + "</i>" : "") + "</span>" +
+        '<span class="r">' + right + "</span></div>";
+    }).join("");
+
+    // 三天內拿下新節點就在頂部判斷句下面提一句，過了就自己消失
+    if (done.length) {
+      var latest = done[done.length - 1];
+      var ago = diffDays(parse(latest.on), today);
+      if (ago >= 0 && ago <= 3) {
+        var el = document.getElementById("wp-fresh");
+        el.innerHTML = "剛達成 <b>" + f1(latest.kg) + " kg</b>" +
+          (latest.tag ? "，" + latest.tag : "") +
+          '<span class="when">' +
+          (ago === 0 ? "今天" : ago === 1 ? "昨天" : ago + " 天前") + "</span>";
+        el.hidden = false;
+      }
+    }
+  })();
+
+  // 趨勢圖
+  function renderChart() {
+    var W = 340, H = 200;
+    var padL = 26, padR = 8, padT = 12, padB = 22;
+    var domEnd = horizonEnd;
+    if (today > domEnd) domEnd = today;
+    if (weighed.length) {
+      var lastD = parse(weighed[weighed.length - 1].date);
+      if (lastD > domEnd) domEnd = lastD;
+    }
+    var span = Math.max(1, diffDays(start, domEnd));
+
+    var vals = [BASE, horizonTarget];
+    weighed.forEach(function (e) { vals.push(weightOf(e)); });
+    vals = vals.filter(function (v) { return !isNaN(v); });
+    var vmax = Math.max.apply(null, vals) + 0.35;
+    var vmin = Math.min.apply(null, vals) - 0.35;
+    if (vmax - vmin < 1.2) { var mid0 = (vmax + vmin) / 2; vmax = mid0 + 0.6; vmin = mid0 - 0.6; }
+
+    function X(d) { return padL + (diffDays(start, d) / span) * (W - padL - padR); }
+    function Y(v) { return padT + (1 - (v - vmin) / (vmax - vmin)) * (H - padT - padB); }
+
+    var s = '<svg class="chart" viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="體重趨勢圖">';
+
+    var step = 0.5;
+    var g = Math.ceil(vmin / step) * step;
+    for (; g <= vmax; g += step) {
+      var y = Y(g);
+      s += '<line x1="' + padL + '" y1="' + y.toFixed(1) + '" x2="' + (W - padR) + '" y2="' + y.toFixed(1) +
+        '" stroke="var(--hair)" stroke-width="1" vector-effect="non-scaling-stroke"/>';
+      s += '<text x="' + (padL - 6) + '" y="' + (y + 3.2).toFixed(1) + '" text-anchor="end" font-size="8.5" fill="var(--faint)" font-family="inherit">' +
+        g.toFixed(1) + "</text>";
+    }
+
+    /* 目標走廊：從本輪起點斜下到四週後目標，帶正負 0.2 的寬容區間。
+       滾動制下這條線每週一會往前挪，所以只畫本輪，不畫歷史。 */
+    if (weekAnchor !== null && horizonTarget !== null) {
+      var xs = X(thisMon), xe = X(horizonEnd);
+      var band = 0.2;
+      s += '<path d="M' + xs.toFixed(1) + " " + Y(weekAnchor).toFixed(1) + "L" + xe.toFixed(1) + " " + Y(horizonTarget + band).toFixed(1) +
+        "L" + xe.toFixed(1) + " " + Y(horizonTarget - band).toFixed(1) + "Z" + '" fill="var(--good-fill)"/>';
+      s += '<line x1="' + xs.toFixed(1) + '" y1="' + Y(weekAnchor).toFixed(1) + '" x2="' + xe.toFixed(1) + '" y2="' + Y(horizonTarget).toFixed(1) +
+        '" stroke="var(--good)" stroke-width="1" stroke-dasharray="3 3" opacity="0.6" vector-effect="non-scaling-stroke"/>';
+    }
+
+    if (today >= start && today <= domEnd) {
+      var tx = X(today);
+      s += '<line x1="' + tx.toFixed(1) + '" y1="' + padT + '" x2="' + tx.toFixed(1) + '" y2="' + (H - padB) +
+        '" stroke="var(--faint)" stroke-width="1" stroke-dasharray="2 4" opacity="0.7" vector-effect="non-scaling-stroke"/>';
+    }
+
+    var ticks = [];
+    for (var i = 0; i <= span; i += 7) ticks.push(i);
+    if (ticks[ticks.length - 1] !== span) ticks.push(span);
+    ticks.forEach(function (off) {
+      var d = addDays(start, off);
+      s += '<text x="' + X(d).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle" font-size="8.5" fill="var(--faint)" font-family="inherit">' +
+        md(d) + "</text>";
+    });
+
+    weighed.forEach(function (e) {
+      s += '<circle cx="' + X(parse(e.date)).toFixed(1) + '" cy="' + Y(weightOf(e)).toFixed(1) +
+        '" r="2.2" fill="var(--good)" opacity="0.4"/>';
+    });
+
+    var pts = [];
+    var cursor = new Date(start.getTime());
+    while (cursor <= domEnd) {
+      var key = iso(cursor);
+      if (byDate[key] && weightOf(byDate[key]) !== null) {
+        var m = ma7(key);
+        if (m !== null) pts.push(X(cursor).toFixed(1) + "," + Y(m).toFixed(1));
+      }
+      cursor = addDays(cursor, 1);
+    }
+    if (pts.length > 1) {
+      s += '<polyline points="' + pts.join(" ") + '" fill="none" stroke="var(--good)" stroke-width="2" ' +
+        'stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>';
+      var head = pts[pts.length - 1].split(",");
+      s += '<circle cx="' + head[0] + '" cy="' + head[1] + '" r="3.2" fill="var(--bg)" stroke="var(--good)" stroke-width="2"/>';
+    } else if (pts.length === 1) {
+      var one = pts[0].split(",");
+      s += '<circle cx="' + one[0] + '" cy="' + one[1] + '" r="3.2" fill="var(--good)"/>';
+    }
+    s += "</svg>";
+    document.getElementById("wp-chart").innerHTML = s;
+  }
+  renderChart();
+
+  /* 體組成。資料來自體重計 app 的截圖，只有量到的日子才有 entry.body，
+     欄位全部可缺，缺的就不顯示。變化量是跟第一次量到的那次比。
+     good 表示往哪個方向走算是好的：down 越低越好，up 越高越好，flat 不評價。 */
+  var BODY_FIELDS = [
+    { k: "fat_pct",             label: "體脂率",   unit: "%",    d: 1, good: "down" },
+    { k: "muscle_kg",           label: "肌肉量",   unit: "kg",   d: 2, good: "up" },
+    { k: "visceral",            label: "內臟脂肪", unit: "",     d: 0, good: "down" },
+    { k: "bmr",                 label: "基礎代謝", unit: "kcal", d: 0, good: "up" },
+    { k: "bmi",                 label: "BMI",      unit: "",     d: 1, good: "down" },
+    { k: "skeletal_muscle_pct", label: "骨骼肌",   unit: "%",    d: 1, good: "up" },
+    { k: "fat_free_kg",         label: "去脂體重", unit: "kg",   d: 2, good: "up" },
+    { k: "subcutaneous_pct",    label: "皮下脂肪", unit: "%",    d: 1, good: "down" },
+    { k: "water_pct",           label: "身體水分", unit: "%",    d: 1, good: "up" },
+    { k: "protein_pct",         label: "蛋白質",   unit: "%",    d: 1, good: "up" },
+    { k: "bone_kg",             label: "骨量",     unit: "kg",   d: 2, good: "flat" },
+    { k: "metabolic_age",       label: "代謝年齡", unit: "歲",   d: 0, good: "down" }
+  ];
+
+  function renderBody() {
+    var box = document.getElementById("wp-body");
+    var dateEl = document.getElementById("wp-body-date");
+    var measured = entries.filter(function (e) { return e.body && typeof e.body === "object"; });
+
+    if (!measured.length) {
+      dateEl.textContent = "";
+      box.innerHTML = '<div class="empty">還沒有體組成資料，量體重時把體重計 app 的數據截圖丟進來就會出現</div>';
+      return;
+    }
+
+    var latest = measured[measured.length - 1];
+    var first = measured[0];
+    dateEl.textContent = md(parse(latest.date)) + (latest.date === todayISO ? "，今天" : "");
+
+    var h = '<div class="bodygrid">';
+    BODY_FIELDS.forEach(function (f) {
+      var v = latest.body[f.k];
+      if (v === null || v === undefined || isNaN(Number(v))) return;
+      v = Number(v);
+      var delta = "";
+      var prev = latest !== first ? first.body[f.k] : undefined;
+      if (prev !== null && prev !== undefined && !isNaN(Number(prev))) {
+        var diff = v - Number(prev);
+        if (Math.abs(diff) >= Math.pow(10, -f.d) / 2) {
+          var cls = f.good === "flat" ? "flat" : (diff < 0) === (f.good === "down") ? "good" : "bad";
+          delta = '<span class="delta ' + cls + '">' + (diff > 0 ? "+" : "") + diff.toFixed(f.d) + "</span>";
+        }
+      }
+      h += '<div><div class="k">' + f.label + '</div><div class="v num">' + v.toFixed(f.d) +
+        (f.unit ? "<small>" + f.unit + "</small>" : "") + delta + "</div></div>";
+    });
+    h += "</div>";
+
+    if (measured.length > 1) {
+      h += '<div class="body-note">變化量是跟 ' + md(parse(first.date)) + " 第一次量的比。</div>";
+    } else {
+      h += '<div class="body-note">只有一次記錄，還沒有變化量可以比。</div>';
+    }
+    box.innerHTML = h;
+  }
+  renderBody();
+
+  // 頁尾
+  var phaseName = { trial: "試驗期", loss: "減重期", maintain: "維持期" }[cfg.phase] || cfg.phase || "";
+  document.getElementById("wp-foot").innerHTML =
+    "<span>" + phaseName + "</span>" +
+    "<span>每週 " + WEEKLY + " kg，滾動看未來 " + HORIZON + " 週</span>" +
+    "<span>baseline " + f1(BASE) + " kg</span>" +
+    "<span>長期方向 " + f1(Number(cfg.goal_kg)) + " kg</span>";
+  if (cfg.budget_pending_bmr) {
+    document.getElementById("wp-foot-note").textContent =
+      "每日 " + BUDGET + " kcal 為暫定值，收到 BMR 資料後重算。";
+  }
+
+  /* 重新整理：手機 app 是包著網頁的殼，資料改了但畫面還是舊的時候按這個。
+     單純 location.reload() 會吃到 service worker 與 WKWebView 的快取，
+     所以先清掉 Cache Storage，再帶一個時間戳重新載入，繞過所有快取。 */
+  var reloadBtn = document.getElementById("wp-reload");
+  var reloading = false;
+  function hardReload() {
+    var base = location.href.split("?")[0].split("#")[0];
+    location.replace(base + "?r=" + new Date().getTime());
+  }
+  reloadBtn.addEventListener("click", function () {
+    if (reloading) return;
+    reloading = true;
+    reloadBtn.textContent = "更新中";
+    var done = false;
+    function go() {
+      if (done) return;
+      done = true;
+      hardReload();
+    }
+    // 清快取如果卡住，最多等一秒就直接重載，不要讓使用者盯著「更新中」
+    setTimeout(go, 1000);
+    try {
+      if (window.caches && caches.keys) {
+        caches.keys().then(function (keys) {
+          return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+        }).then(go, go);
+      } else {
+        go();
+      }
+    } catch (err) { go(); }
+  });
+})();
+</script>
+
+<script>
+/* 註冊 service worker，只在自己的網域上跑。
+   發佈成 Artifact 時是沙箱環境，沒有 service worker 也抓不到 sw.js，
+   這裡全部包起來靜默失敗，不能讓面板本身壞掉。 */
+(function () {
+  try {
+    if (window.top !== window.self) return;
+    var host = location.hostname;
+    var secure = location.protocol === "https:" || host === "localhost" || host === "127.0.0.1";
+    if (!secure) return;
+    if (!("serviceWorker" in navigator)) return;
+    window.addEventListener("load", function () {
+      try {
+        navigator.serviceWorker.register("sw.js").catch(function () {});
+      } catch (err) { /* 沙箱擋下註冊，忽略 */ }
+    });
+  } catch (err) { /* 抓不到 navigator.serviceWorker，忽略 */ }
+})();
+</script>
